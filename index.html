@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Home</title>
+</head>
+<body>
+	<div id="container">
+		<h1>TV/Movie Wiki</h1>
+		<form action="/search" enctype="multipart/form-data" method="POST">
+			Search: <input type="text" name="searchtext">
+			<select>
+				<option value="title">Title</option>
+				<option value="person">Person</option>
+			</select>
+			<input type="submit" value="Submit">
+		</form>
+	</div>
+</body>
