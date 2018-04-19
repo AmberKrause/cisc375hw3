@@ -1,0 +1,22 @@
+{
+  "name": "movie_wiki",
+  "version": "1.0.0",
+  "description": "TV/Movie Wiki",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodejs server.js"
+  },
+  "author": "Amber Krause and Chi Nou Vang",
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nunuchi/cisc375hw3"
+  },
+  "dependencies": {
+    "ejs": "^2.5.8",
+    "express": "latest",
+    "express-validator": "^5.1.2",
+    "sqlite3": "3.1.x"
+  }
+}

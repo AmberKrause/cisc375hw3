@@ -7,9 +7,9 @@
 <body>
 	<div id="container">
 		<h1>TV/Movie Wiki</h1>
-		<form action="/search" enctype="multipart/form-data" method="POST">
-			Search: <input type="text" name="searchtext">
-			<select>
+		<form action="/search" method="POST">
+			Search: <input name="search-text" type="text">
+			<select name="category">
 				<option value="title">Title</option>
 				<option value="person">Person</option>
 			</select>
