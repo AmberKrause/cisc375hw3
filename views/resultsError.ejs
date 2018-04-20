@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Search Results</title>
+</head>
+<body>
+	<div id="container">
+		<h1>Results</h1>
+    <ul>
+      
+    </ul>
+
+    <!-- Displays only if the user does not provide text information-->
+    <% if(errors !=undefined) { %>
+	<ul>
+		<% errors.forEach(function(error){%>
+		<li> <%= error.msg %> </li>
+		<% }) %>
+		</ul>
+	<% } %>
+	<!-- Displays only if the user does not provide text information-->
+
+	
+
+	</div>
+</body>
+</html>

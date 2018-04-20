@@ -3,6 +3,19 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<title>Search Results</title>
+	<style type="text/css">
+		html{
+			font-size: 62.5%;
+		}
+
+		table, tr, td {
+			border-style: solid;
+		}
+
+		tr {
+			font-size: 2rem;
+		}
+	</style>
 </head>
 <body>
 	<div id="container">
@@ -10,6 +23,32 @@
     <ul>
       
     </ul>
+
+    <!-- Displays only if the user does not provide text information-->
+    <table>
+    	<tr>
+    		<th>Title</th>
+    		<th>Type</th>
+    		<th>Start Year</th>
+    		<th>End Year</th>
+    		<th>Runtime</th>
+    		<th>Genres</th>
+    	</tr>
+	<% sqlHolder.forEach(function(x){%>
+		<tr>
+			<td><%= x.primary_title %></td> 
+			<td><%= x.title_type %></td>
+			<td><%= x.start_year %></td>
+			<td><%= x.end_year %></td>
+			<td><%= x.runtime_minutes %></td>
+			<td><%= x.genres %></td>
+		</tr>
+		<% }) %>
+	</table>
+	<!-- Displays only if the user does not provide text information-->
+
+	
+
 	</div>
 </body>
 </html>
