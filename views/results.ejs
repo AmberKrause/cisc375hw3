@@ -32,7 +32,7 @@
     		<th>Start Year</th>
     		<th>End Year</th>
     		<th>Runtime</th>
-    		<th>Genres</th>
+    		<th>Link</th>
     	</tr>
 	<% sqlHolder.forEach(function(x){%>
 		<tr>
@@ -41,7 +41,7 @@
 			<td><%= x.start_year %></td>
 			<td><%= x.end_year %></td>
 			<td><%= x.runtime_minutes %></td>
-			<td><%= x.genres %></td>
+			<td><a href="apple.com?<%= x.tconst %>">Info</a></td>
 		</tr>
 		<% }) %>
 	</table>
