@@ -15,39 +15,58 @@
 		tr {
 			font-size: 2rem;
 		}
+
+		form {
+			margin-bottom: 10px;
+		}
 	</style>
 </head>
 <body>
 	<div id="container">
 		<h1>Results</h1>
-    <ul>
-      
-    </ul>
 
-    <!-- Displays only if the user does not provide text information-->
+		<form action="/" method="GET">
+			<input type="submit" value="Back to Search">
+		</form>
+
     <table>
     	<tr>
-    		<th>Title</th>
-    		<th>Type</th>
-    		<th>Start Year</th>
-    		<th>End Year</th>
-    		<th>Runtime</th>
-    		<th>Link</th>
+				<% if(sqlHolder[0].type==='title') { %>
+	    		<th>Title</th>
+	    		<th>Type</th>
+	    		<th>Start Year</th>
+	    		<th>End Year</th>
+				<% } else {%>
+					<th>Name</th>
+	    		<th>Professions</th>
+	    		<th>Birth Year</th>
+	    		<th>Death Year</th>
+				<% } %>
     	</tr>
-	<% sqlHolder.forEach(function(x){%>
-		<tr>
-			<td><%= x.primary_title %></td> 
-			<td><%= x.title_type %></td>
-			<td><%= x.start_year %></td>
-			<td><%= x.end_year %></td>
-			<td><%= x.runtime_minutes %></td>
-			<td><a href="apple.com?<%= x.tconst %>">Info</a></td>
-		</tr>
-		<% }) %>
-	</table>
-	<!-- Displays only if the user does not provide text information-->
+			<% sqlHolder.forEach(function(x){%>
+				<% if(x.type==='title') { %>
+					<tr>
+						<td><a href="/title?id=<%= x.tconst %>"><%= x.primary_title %></a></td>
+						<td><%= x.title_type %></td>
+						<td><%= x.start_year %></td>
+						<td><%= x.end_year %></td>
+					</tr>
+				<% } else {%>
+					<tr>
+						<td><a href="/person?id=<%= x.nconst %>"><%= x.primary_name %></a></td>
+						<td><%= x.primary_profession %></td>
+						<td><%= x.birth_year %></td>
+						<% if(x.death_year===null) { %>
+						<td>present</td>
+						<% } else { %>
+						<td><%= x.death_year %></td>
+						<% } %>
+					</tr>
+				<% } %>
+			<% }) %>
+		</table>
 
-	
+
 
 	</div>
 </body>
