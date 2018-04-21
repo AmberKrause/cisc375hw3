@@ -68,6 +68,11 @@ app.set('views', path.join(__dirname, 'views'));
 //set static path
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/', (req, res) => {
+	res.render('index', {
+			errors: undefined
+	});//res.render end
+});
 
 //POST request from search form in index.html
 app.post('/search', (req, res) => {
@@ -83,8 +88,8 @@ app.post('/search', (req, res) => {
     //to possibly make user search possible
     var sql = 'SELECT * FROM Titles NATURAL JOIN Ratings';
 
-    console.log(req.headers);
-    console.log(req.body);
+    //console.log(req.headers);
+    //console.log(req.body);
 
     //validate form input
     //req.checkBody('search-text', 'Enter text to search').trim().isLength({min: 1});
@@ -94,12 +99,12 @@ app.post('/search', (req, res) => {
     var errors = req.validationErrors();
     if (errors) { //Sends to an Error Page, telling you what is wrong
         console.log(errors)
-        res.render('resultsError', {
+        res.render('index', {
             errors: errors
         });//res.render end
     }//if(errors)
 
-    else 
+    else
     { //Correct input sends you to the results page
 
         console.log(sqlSearch);
@@ -151,5 +156,5 @@ function getData(sql, method) { //gets the SQL data
     });//dbs end
     dbs.close()
     });//my Promise End
-    return myPromise; 
+    return myPromise;
 }//getData end

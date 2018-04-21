@@ -17,12 +17,13 @@
 		</form>
 	</div>
 
-	<% if(errors != undefined) { %>
+	<!-- Displays only if the user does not provide text information-->
+		<% if(errors !=undefined) { %>
+	<ul>
 		<% errors.forEach(function(error){%>
-		<%= error.msg %>
+		<li> <%= error.msg %> </li>
 		<% }) %>
+		</ul>
 	<% } %>
-	<% else if(errors) { %>
-	<% console.log('No errors?') %>
-	<% }) %>
+	<!-- Displays only if the user does not provide text information-->
 </body>
