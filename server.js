@@ -14,16 +14,8 @@ var app = express();
 var port = 3000;
 
 //ArraySets
-var sqlHolder = [
-    {
-        primary_title: 'row.primary_title',
-        title_type: 'row.title_type',
-        start_year: 'row.start_year',
-        end_year: 'row.end_year',
-        runtime_minutes: 'row.runtime_minutes',
-        genres: 'row.genres'
-    }
-    ]
+var sqlHolder = [];
+
 
 
 
@@ -89,7 +81,7 @@ app.post('/search', (req, res) => {
 
     //use the req.body.x in conjunction with SQL statements below
     //to possibly make user search possible
-    var sql = 'SELECT * FROM Titles LIMIT 50';
+    var sql = 'SELECT * FROM Titles NATURAL JOIN Ratings';
 
     console.log(req.headers);
     console.log(req.body);
@@ -111,10 +103,10 @@ app.post('/search', (req, res) => {
     { //Correct input sends you to the results page
 
         console.log(sqlSearch);
-        getData(sql, 'GET').then(function(sqlHolder) {//promise
+        getData(sql).then(function(sqlHolder) {//promise
             //Promise doesn't work correctly, need to refresh
             //to show the data, else the query works
-
+            console.log('then function');
             res.render('results', { //prints out sql to results page
             sqlHolder: sqlHolder
             });//res.render end
@@ -130,16 +122,17 @@ app.listen(port, () => {
 
 function getData(sql, method) { //gets the SQL data
     var sqlItem = sql;
+    var rowlength; //to hold rowlength
+    var currentrowlength = 0; //to hold current row
     var myPromise = new Promise(function(resolve, reject) {
-
         var dbs = new sqlite3.Database('./imdb.sqlite3');
-
-        dbs.all(sqlItem, [], (err, rows) => {
-        if(err) {
+        sqlHolder = []; //resets the sqlHolder array to be empty so data doesn't repeat
+        dbs.all(sqlItem, [], (err, rows) => { rowlength = rows.length; console.log(rowlength);
+        if(err) {// logs error
             console.log(err);
         }//if(err)
-        rows.forEach((row) => { console.log(row);
-            sqlHolder.push('results', {
+        rows.forEach((row) => { currentrowlength += 1; console.log(currentrowlength);
+            sqlHolder.push({
             //set Var name: actual variable
             //for results: data for results
             primary_title: row.primary_title,
@@ -147,13 +140,16 @@ function getData(sql, method) { //gets the SQL data
             start_year: row.start_year,
             end_year: row.end_year,
             runtime_minutes: row.runtime_minutes,
-            genres: row.genres
+            genres: row.genres,
+            average_rating: row.average_rating,
+            num_votes: row.num_votes
         });//sql push
+            if(currentrowlength == rowlength) { resolve(sqlHolder); console.log('Done');}
+            else if(rowlength < 0) {reject('Unsuitable Data for usage because of 0 length!');}
+            //Resolving and Rejecting if statements, to determine wait for data
         });//forEach
     });//dbs end
     dbs.close()
-    resolve(sqlHolder);
-    reject('No SQL');
     });//my Promise End
     return myPromise; 
 }//getData end
