@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Search Results</title>
+	<style type="text/css">
+		html{
+			font-size: 62.5%;
+		}
+
+		table, tr, td {
+			border-style: solid;
+		}
+
+		tr {
+			font-size: 2rem;
+		}
+	</style>
+</head>
+<body>
+	<div id="container">
+		<h1>Person</h1>
+    <ul>
+      
+    </ul>
+
+    <!-- Displays only if the user does not provide text information-->
+    <table>
+    	<tr>
+    		<th>Name</th>
+    		<th>Birth Year</th>
+    		<th>Death Year</th>
+    		<th>Primary Professions</th>
+    		<th>Known For</th>
+    	</tr>
+	<% sqlPeopleArray.forEach(function(x){%>
+		<tr>
+			<td><%= x.primary_name %></td> 
+			<td><%= x.birth_year %></td>
+			<td><%= x.death_year %></td>
+			<td><%= x.primary_profession %></td>
+			
+			<td><% for(var i = 0; i < x.known_for_titles.split(',').length; i++) {%> 
+				<a href="/title?id=<%= x.known_for_titles.split(',')[i] %>"><%= x.known_for_titles.split(',')[i] %></a> 
+				<% } %>
+
+				</td>
+
+		</tr>
+		<% }) %>
+	</table>
+	<!-- Displays only if the user does not provide text information-->
+
+	
+
+	</div>
+</body>
+</html>
