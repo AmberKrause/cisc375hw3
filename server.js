@@ -17,7 +17,9 @@ var port = 3000;
 //ArraySets
 var sqlHolder = [];
 var sqlTitleArray = [];
+var sqlTitlePrincipalsArray = [];
 var sqlPeopleArray = [];
+
 
 //middleware, required to use the modules
 app.use(bodyParser.json());
@@ -52,6 +54,7 @@ app.get('/', (req, res) => {
 			errors: undefined
 	});//res.render end
 });
+
 
 //POST request from search form in index.html
 app.post('/search', (req, res) => {
@@ -110,13 +113,29 @@ app.post('/search', (req, res) => {
 
 });//app.post end
 
+app.post('/updateTitle', (req, res) => {
+  console.log(req.headers);
+  console.log(req.body);
+
+  
+
+});//app.post end
+
+
+
 //New Get 4-22-18
 app.get('/title', function(req, res){
-	getExtendData(req.query.id).then(function(sqlTitleArray){//promise
+	var titlePromise = getExtendData(req.query.id);
+  var peoplePromise = getTitlePrincipalData(req.query.id);
+
+  Promise.all([titlePromise, peoplePromise]).then(function(values){//promise
 		res.render('title', {
-			sqlTitleArray: sqlTitleArray
+			sqlTitleArray: values[0],
+      sqlTitlePrincipalsArray: values[1]
 		});//res.render end
-		console.log('Title Array'+' '+sqlTitleArray)
+    //console.log(values);
+    //console.log(values[0]);
+		console.log('Title Array'+' '+values[0]+' Title Principals Array: '+values[1]);
 	});//getExtendedData end
 })//app.get end
 
@@ -192,54 +211,91 @@ function getData(sql, method) { //gets the SQL data
 
 //New function 4-22-18
 function getExtendData(inputID) {
-    var rowlength; //to hold rowlength
-    var currentrowlength = 0; //to hold current row
-    var sqlItem = 'SELECT primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, ordering, nconst, category FROM Titles NATURAL JOIN Ratings NATURAL JOIN Crew NATURAL JOIN Principals WHERE tconst='+'"'+inputID+'"';
+    //var rowlength; //to hold rowlength
+    //var currentrowlength = 0; //to hold current row
+
+    var sqlItem = 'SELECT tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") NATURAL JOIN Ratings NATURAL JOIN Crew';
     sqlTitleArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
-	var myPromise = new Promise(function(resolve, reject) {
-		var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
-			if(err) {
-				return console.error(err.message);
-			}//if(err) end
-		});//dbs end
-		console.log(sqlItem);
+	   var myPromise = new Promise(function(resolve, reject) {
+	     var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+	        if(err) {
+            return console.error(err.message);
+             }//if(err) end
+	      });//dbs end
+	      console.log(sqlItem);
+        dbs.get(sqlItem, [], (err, row) => {
+        	console.log(row);
+        	if(err) {// logs error
+            console.log(err);
+        	}//if(err)
+
+    			//reject promise if no rows to prevent infinite loop
+    			if(row === null) {reject('Unsuitable Data for usage because of 0 length!');}
+    			//fill sqlHolder with data
+
+            sqlTitleArray = row;
+
+            resolve(sqlTitleArray);
+            console.log('Done Title Data');
+            //Resolving and Rejecting if statements, to determine wait for data
+        //});//forEach
+      });//dbs end
+      dbs.close();
+	   });//Promise End
+	return myPromise;
+
+}//getExtendedData End
+
+
+//New function 4-22-18
+function getTitlePrincipalData(inputID) {
+    var rowlength; //to hold rowlength
+    var currentrowlength = 0; //to hold current row
+    var sqlItem = 'SELECT tconst, ordering, nconst, category, primary_name FROM (SELECT * FROM Titles WHERE tconst='+'"'+inputID+'") NATURAL JOIN Principals NATURAL JOIN Names ORDER BY ordering';
+    sqlTitlePrincipalsArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
+
+	   var myPromise = new Promise(function(resolve, reject) {
+	     var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+	        if(err) {
+            return console.error(err.message);
+             }//if(err) end
+	      });//dbs end
+	      console.log(sqlItem);
         dbs.all(sqlItem, [], (err, rows) => {
-        	console.log(rows);
+          console.log(rows);
         	console.log('rowlength = rows.length')
         	var rowlength = rows.length;
         	if(err) {// logs error
             console.log(err);
         	}//if(err)
 
-			//reject promise if no rows to prevent infinite loop
-			if(rowlength < 1) {reject('Unsuitable Data for usage because of 0 length!');}
-			console.log(rows.ordering);
-			//fill sqlHolder with data from each row
-			rows.forEach((row) => { currentrowlength += 1;
-				sqlTitleArray.push({
-					tconst: row.tconst,
-				    primary_title: row.primary_title,
-				    title_type: row.title_type,
-				    start_year: row.start_year,
-				    end_year: row.end_year,
-				    runtime_minutes: row.runtime_minutes,
-				    genres: row.genres,
-				    average_rating: row.average_rating,
-				    num_votes: row.num_votes,
-				    ordering: row.ordering,
-				    nconst: row.nconst,
-				    category: row.category
-				});//sql push
-						
-            if(currentrowlength == rowlength) { resolve(sqlTitleArray); console.log('Done Title Data');}
-            //Resolving and Rejecting if statements, to determine wait for data
-        });//forEach
-    });//dbs end
-    dbs.close();
-	});//Promise End
+    			//reject promise if no rows to prevent infinite loop
+    			if(rowlength < 1) {reject('Unsuitable Data for usage because of 0 length!');}
+    			//fill sqlHolder with data
+
+    			rows.forEach((row) => { currentrowlength += 1;
+    				sqlTitlePrincipalsArray.push({
+    					  tconst: row.tconst,
+    				    ordering: row.ordering,
+    				    nconst: row.nconst,
+    				    category: row.category,
+                primary_name: row.primary_name
+    				});//sql push
+
+            if(currentrowlength == rowlength) { resolve(sqlTitlePrincipalsArray); console.log('Done Principals Data for Title'); }
+
+          });//forEach
+      });//dbs end
+      dbs.close();
+	   });//Promise End
 	return myPromise;
-}//getExtendedData End
+
+
+}//getTitlePrincipalData End
+
+
+
 
 //New function 4-22-18
 function getPersonData(inputID) {
@@ -277,7 +333,7 @@ function getPersonData(inputID) {
 					death_year: row.death_year,
 					known_for_titles: row.known_for_titles
 				});//sql push
-						
+
             if(currentrowlength == rowlength) { resolve(sqlPeopleArray); console.log('Done Person Data');}
             //Resolving and Rejecting if statements, to determine wait for data
         });//forEach
@@ -287,3 +343,43 @@ function getPersonData(inputID) {
 	});//Promise End
 	return myPromise;
 }//getPersonData End
+
+
+
+
+
+
+
+
+
+
+
+
+
+//area for test queriesvar dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+/*var sqlItem = 'SELECT DISTINCT title_type FROM Titles';
+var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+
+
+   if(err) {
+     return console.error(err.message);
+      }//if(err) end
+ });//dbs end
+ console.log(sqlItem);
+ dbs.all(sqlItem, [], (err, rows) => {
+   console.log(rows);
+   console.log('rowlength = rows.length')
+   var rowlength = rows.length;
+   if(err) {// logs error
+     console.log(err);
+   }//if(err)
+
+
+
+   rows.forEach((row) => {
+     console.log(row.title_type);
+
+
+
+   });//forEach
+});//dbs end*/
