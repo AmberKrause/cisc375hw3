@@ -1,22 +1,82 @@
 <!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
 	<title>About the Project</title>
+	<style type="text/css">
+		html {font-size: 62.5%}
+		body {font-size: 2rem;}
+		a {
+			text-decoration: none;
+			color: #3e3e3e;
+			font-weight: bold;
+			padding: 0 2em;
+			float: center;
+		}
+		#infoHeader{text-align: center;}
+		#nou {width: 100%;}
+		.center {text-align: center;}
+		.linkSetup {
+			text-align: center;
+			font-size: 2rem;
+		}
+
+	</style>
 </head>
 <body>
+	<div class="linkSetup">
+		<a href="#amber">Amber</a>
+		<a href="#nou">Nou</a>
+		<a href="#projectInfo">Project Info</a>
+		<a href="#video">Video</a>
+	</div>
 
 	<div id="amber">
 		<p>[Insert Bio]</p>
 
 
 	</div>
+	<hr>
 	<div id="nou">
-		<p>[Insert Bio]</p>
+		<div class="center"><img src="images/nou.png"> </div>
+		<div><p>Sleep deprived Information Systems Major student at the University of St. Thomas. Loves birds and have raised chickens and quails, that were all eaten by someone or some animal that was not him. Enjoys gaming. Current games of interest: Xenoblade Chronicles 2, Fire Emblem Heroes/Fates, Mario Odyssey. </p></div>
 
 	</div>
 	<div id="projectInfo">
-		<p>[Insert Project Information]</p>
+		<h1 id="infoHeader">Modules Used</h1><hr>
+		<h3>Express.js</h3>
+		<p>Express, is a web app framework that we used with Node.js to build this app. It's needed for the other modules.
+		Express allows for us to do GET/POST/SET/USE(module) with web pages, thus allowing us to get and display data directly to the pages with user requests.</p>
 
+		<h3>BodyParser.js</h3>
+		<p>BodyParser is a middleware for Express, it is used to handle HTTP POST requests. It gets the requests, with 'req', and then we can use it in our codes. Example data that we used it to get are the input and category for the search. We also got the query-string from the html link and used it for our data search and page display as well.</p>
+
+		<h3>Sqlite3</h3>
+		<p>A database module that we used to allow access to the sqlite3 database given for the assignment. It allows us to open, query, and edit the database.</p>
+
+		<h3>Validator</h3>
+		<p>With this module, we used Validation to check the input values are valid. If the values weren't valid then we would return an error on the page. We also used this module for Sanitization, in that we removed characters and such from the input data. With Sanitization, we can protect ourselves from hackers who wants to drop our tables.</p>
+
+		<h4>Query-String</h4>
+		<p>Not really in use, to our knowledge, as we have BodyParser grabbing the actual query-string. It's still there and may have some uses but we aren't actually using it. It should just get the query-string for grabbing data like BodyParser. </p>
+
+		<h4>File-System(FS)</h4>
+		<p>API module for interacting with the file system.</p>
+
+		<h4>PATH</h4>
+		<p>Allows for file and directory path usage. Sends the users to them. </p>
+
+		<h4>HTTP</h4>
+		<p>Allows for us to setup the HTTP web server and client.</p>
+
+		<h4>URL</h4>
+		<p>Gives the capability for adjusting URL resolution and parsing.</p>
+	</div>
+	<hr>
+	<div id="video">
+		<h1>Video Example</h1>
+		[video-content]
 	</div>
 
 </body>
