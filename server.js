@@ -117,7 +117,7 @@ app.post('/updateTitle', (req, res) => {
   console.log(req.headers);
   console.log(req.body);
 
-  
+
 
 });//app.post end
 
@@ -132,11 +132,13 @@ app.get('/title', function(req, res){
 		res.render('title', {
 			sqlTitleArray: values[0],
       sqlTitlePrincipalsArray: values[1]
-		});//res.render end
+    });//res.render end
     //console.log(values);
     //console.log(values[0]);
 		console.log('Title Array'+' '+values[0]+' Title Principals Array: '+values[1]);
-	});//getExtendedData end
+	}).catch(function(err) {
+      console.log('Error when rendering title page:' + err.message);
+  });//getExtendedData end
 })//app.get end
 
 //New Get 4-22-18
@@ -146,7 +148,9 @@ app.get('/person', function(req, res){
 			sqlPeopleArray: sqlPeopleArray
 		});//res.render end
 		console.log('People Array'+sqlPeopleArray)
-	});//getExtendedData end
+	}).catch(function(err) {
+      console.log('Error when rendering person page:' + err.message);
+  });//getExtendedData end
 })//app.get end
 
 app.listen(port, () => {
@@ -214,7 +218,7 @@ function getExtendData(inputID) {
     //var rowlength; //to hold rowlength
     //var currentrowlength = 0; //to hold current row
 
-    var sqlItem = 'SELECT tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") NATURAL JOIN Ratings NATURAL JOIN Crew';
+    var sqlItem = 'SELECT Titles.tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") AS Titles LEFT OUTER JOIN Ratings ON Titles.tconst=Ratings.tconst LEFT OUTER JOIN Crew ON Titles.tconst=Crew.tconst';
     sqlTitleArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
 	   var myPromise = new Promise(function(resolve, reject) {
@@ -231,11 +235,11 @@ function getExtendData(inputID) {
         	}//if(err)
 
     			//reject promise if no rows to prevent infinite loop
-    			if(row === null) {reject('Unsuitable Data for usage because of 0 length!');}
+    			if(row === undefined) {reject('No query results');}
     			//fill sqlHolder with data
 
             sqlTitleArray = row;
-
+            console.log('sqlTitleArray:' + sqlTitleArray);
             resolve(sqlTitleArray);
             console.log('Done Title Data');
             //Resolving and Rejecting if statements, to determine wait for data
@@ -252,7 +256,7 @@ function getExtendData(inputID) {
 function getTitlePrincipalData(inputID) {
     var rowlength; //to hold rowlength
     var currentrowlength = 0; //to hold current row
-    var sqlItem = 'SELECT tconst, ordering, nconst, category, primary_name FROM (SELECT * FROM Titles WHERE tconst='+'"'+inputID+'") NATURAL JOIN Principals NATURAL JOIN Names ORDER BY ordering';
+    var sqlItem = 'SELECT Titles.tconst, ordering, Principals.nconst, category, primary_name FROM (SELECT * FROM Titles WHERE tconst='+'"'+inputID+'") AS Titles LEFT OUTER JOIN Principals ON Titles.tconst=Principals.tconst LEFT OUTER JOIN Names ON Principals.nconst=Names.nconst ORDER BY ordering';
     sqlTitlePrincipalsArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
 	   var myPromise = new Promise(function(resolve, reject) {
@@ -261,15 +265,19 @@ function getTitlePrincipalData(inputID) {
             return console.error(err.message);
              }//if(err) end
 	      });//dbs end
-	      console.log(sqlItem);
+	      //console.log(sqlItem);
         dbs.all(sqlItem, [], (err, rows) => {
-          console.log(rows);
-        	console.log('rowlength = rows.length')
-        	var rowlength = rows.length;
+          if(rows === undefined) {
+            reject('No query results');
+          }
+          //console.log(rows);
+        	//console.log('rowlength = rows.length')
+
         	if(err) {// logs error
             console.log(err);
         	}//if(err)
 
+          var rowlength = rows.length;
     			//reject promise if no rows to prevent infinite loop
     			if(rowlength < 1) {reject('Unsuitable Data for usage because of 0 length!');}
     			//fill sqlHolder with data
