@@ -452,7 +452,7 @@ function updateData(sql) { //gets the SQL data
 
 
 //area for test queriesvar dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
-/*var sqlItem = 'SELECT DISTINCT title_type FROM Titles';
+/*var sqlItem = 'SELECT DISTINCT primary_profession FROM Names';
 var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
 
 
@@ -461,8 +461,9 @@ var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
       }//if(err) end
  });//dbs end
  console.log(sqlItem);
+
  dbs.all(sqlItem, [], (err, rows) => {
-   console.log(rows);
+   //console.log(rows);
    console.log('rowlength = rows.length')
    var rowlength = rows.length;
    if(err) {// logs error
@@ -470,11 +471,19 @@ var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
    }//if(err)
 
 
-
+   profs = [];
    rows.forEach((row) => {
-     console.log(row.title_type);
-
-
+     //console.log(row.primary_profession);
+     row_profs = row.primary_profession;
+     row_profs = row_profs.split(",")
+     row_profs.forEach((item) => {
+       profs.push(item);
+     })
 
    });//forEach
+
+   var uniqueArray = profs.filter(function(item, pos) {
+     return profs.indexOf(item) == pos;
+   })
+   console.log(uniqueArray);
 });//dbs end*/
