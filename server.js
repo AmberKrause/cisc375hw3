@@ -397,7 +397,7 @@ function getExtendData(inputID) {
           //reject promise if no rows to prevent infinite loop
           if(row === null) {reject('Unsuitable Data for usage because of 0 length!');}
           //fill sqlHolder with data
-
+          if(row){
             sqlTitleArray = {
                 tconst: row.tconst,
                 primary_title: row.primary_title,
@@ -412,6 +412,23 @@ function getExtendData(inputID) {
                 writers: row.writers,
                 directorsNamed: getCastNames(row.directors),
                 writersNamed: getCastNames(row.writers)
+            }}
+            else {
+              sqlTitleArray = {
+                tconst: inputID,
+                primary_title: inputID+' No Data',
+                title_type: '',
+                start_year: '',
+                end_year: '',
+                runtime_minutes: '',
+                genres: '',
+                average_rating: '',
+                num_votes: '',
+                directors: '',
+                writers: '',
+                directorsNamed: '',
+                writersNamed: ''
+            }
             }
             resolve(sqlTitleArray);
             console.log('Done Title Data');
@@ -664,12 +681,14 @@ function getTitleNames(names) {
 }
 
 function getCastNames(names) {
+    console.log(names+'getCastNames check');
     var rowlength; //to hold rowlength
     var currentrowlength = 0;
-    var nameSplit = names.split(',');
+    var nameSplit;
+    if(names) {nameSplit = names.split(',');}
+    else {nameSplit = ('none,none').split(',');}
     var nameBlock = [];
     var sqlItem;
-
     nameSplit.forEach((nameItem) => {
     sqlItem = 'SELECT nconst, primary_name FROM Names WHERE nconst = "'+nameItem+'"';
 
