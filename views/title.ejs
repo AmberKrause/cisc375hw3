@@ -95,8 +95,7 @@
 			</h2>
 
 			<hr>
-			<p>	<%= moviePoster.image %> stuff</p>
-			<img src="/default_poster.jpg" alt="Poster" height="300">
+			<p>	<%= moviePoster.image %> </p>
 			<img src="https://<%= moviePoster.host %><%= moviePoster.path %>" alt="Poster" height="300">
 			<div>Start Year: <%= sqlTitleArray.start_year %></div>
 			<% if(sqlTitleArray.end_year!==null) { %>
@@ -161,7 +160,6 @@
 				</table>
 			</div>
 			<div class="spacer"></div>
-			<div>From Crew, but it seems like these are included in Principals already, so we may decide to delete:</div>
 			<div>Directors: <%= sqlTitleArray.directors.primary_name %>
 				<ul>
 					<% for(var i = 0; i < sqlTitleArray.directorsNamed.length; i++) {%>

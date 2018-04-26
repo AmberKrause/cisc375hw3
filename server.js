@@ -84,13 +84,21 @@ app.post('/search', (req, res) => {
 			if(req.body.category === 'title')
 			{
 				console.log('title entered');
-				var sql = 'SELECT tconst, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE "' + search_text + '%";';
+        if(req.body.filter === 'on') {
+          var sql = 'SELECT tconst, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE "' + search_text + '" AND title_type = "' + req.body.type +'";';
+        } else {
+          var sql = 'SELECT tconst, primary_title, title_type, start_year, end_year FROM Titles WHERE primary_title LIKE "' + search_text + '";';
+        }
 				console.log(sql);
 			}
 			else if(req.body.category === 'person')
 			{
 				console.log('person entered');
-				var sql = 'SELECT nconst, primary_name, primary_profession, birth_year, death_year FROM Names WHERE primary_name LIKE "' + search_text + '%";';
+        if(req.body.filter === 'on') {
+          var sql = 'SELECT nconst, primary_name, primary_profession, birth_year, death_year FROM Names WHERE primary_name LIKE "' + search_text + '" AND primary_profession LIKE "%' + req.body.profession +'%";';
+        } else {
+          var sql = 'SELECT nconst, primary_name, primary_profession, birth_year, death_year FROM Names WHERE primary_name LIKE "' + search_text + '";';
+        }
 				console.log(sql);
 			}
 
@@ -190,9 +198,86 @@ app.post('/updateTitle', (req, res) => {
       }
   }
 
-
 });//app.post end
 
+app.post('/updateName', (req, res) => {
+  console.log(req.body);
+  var sql;
+  req.sanitizeBody('birth_year').trim();
+  req.sanitizeBody('birth_year').escape();
+  req.sanitizeBody('birth_year').blacklist('\\(\\)\\;');
+  req.sanitizeBody('death_year').escape();
+  req.sanitizeBody('death_year').blacklist('\\(\\)\\;');
+  var birth = parseInt(req.body.birth_year);
+  var death = parseInt(req.body.death_year);
+  if(!isNaN(birth)) {
+    //update birth year
+    sql = 'UPDATE Names SET birth_year = ' + birth + ' WHERE nconst = "' + req.body.nconst + '";';
+    console.log(sql);
+    updateData(sql);
+  }
+  if(!isNaN(death)) {
+    //update death year
+    sql = 'UPDATE Names SET death_year = ' + death + ' WHERE nconst = "' + req.body.nconst + '";';
+    console.log(sql);
+    updateData(sql);
+  } else if(req.body.death_year.length > 0 && req.body.death_year.trim() === '') {
+    //set death year to null if they enter whitespace
+    sql = 'UPDATE Names SET death_year = null WHERE nconst = "' + req.body.nconst + '";';
+    console.log(sql);
+    updateData(sql);
+  }
+  if(req.body.professionChange != 'noChange') {
+    sql = 'SELECT primary_profession FROM Names WHERE nconst = "' + req.body.nconst + '"'
+    var myPromise = new Promise(function(resolve, reject) {
+      var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+         if(err) {
+           console.error(err.message);
+         }//if(err) end
+       });//dbs end
+       dbs.get(sql, [], (err, row) => {
+         if(err) {// logs error
+           console.log(err);
+         }//if(err)
+         else {
+           var currentProfs = row.primary_profession;
+           resolve(currentProfs);
+           console.log(currentProfs);
+         }
+      });//dbs end
+      dbs.close();
+    });
+
+    myPromise.then((currentProfs) => {
+      if(req.body.professionChange == 'add') {
+        currentProfs = currentProfs.split(",");
+        console.log(currentProfs);
+        if(currentProfs.indexOf(req.body.profession) < 0) {
+          currentProfs.push(req.body.profession);
+          console.log(currentProfs);
+          currentProfs = currentProfs.filter(function(val) { return val; }).join(",");
+          console.log(currentProfs);
+          sql = 'UPDATE Names SET primary_profession = "' + currentProfs + '" WHERE nconst = "' + req.body.nconst + '"'
+          updateData(sql);
+          console.log("add profession: " + req.body.profession);
+        }
+      }
+      else {
+        currentProfs = currentProfs.split(",");
+        var index = currentProfs.indexOf(req.body.profession);
+        if(index >= 0) {
+          currentProfs.splice(index, 1);
+          console.log(currentProfs);
+          sql = 'UPDATE Names SET primary_profession = "' + currentProfs + '" WHERE nconst = "' + req.body.nconst + '"'
+          updateData(sql);
+        }
+        console.log("remove profession: " + req.body.profession);
+      }
+    }).catch(function(err) {
+        console.log('Could not update profession: ' + err.message);
+    });
+  }
+});//app.post end
 
 
 //New Get 4-22-18
@@ -293,7 +378,7 @@ function getExtendData(inputID) {
     //var rowlength; //to hold rowlength
     //var currentrowlength = 0; //to hold current row
 
-    var sqlItem = 'SELECT tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") NATURAL JOIN Ratings NATURAL JOIN Crew';
+    var sqlItem = 'SELECT Titles.tconst AS tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") AS Titles LEFT OUTER JOIN Ratings ON Titles.tconst=Ratings.tconst LEFT OUTER JOIN Crew ON Titles.tconst=Crew.tconst';
     sqlTitleArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
      var myPromise = new Promise(function(resolve, reject) {
@@ -398,7 +483,7 @@ function getPersonData(inputID) {
 
     var rowlength; //to hold rowlength
     var currentrowlength = 0; //to hold current row
-    var sqlItem = 'SELECT primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE nconst='+'"'+inputID+'"';
+    var sqlItem = 'SELECT nconst, primary_name, birth_year, death_year, primary_profession, known_for_titles FROM Names WHERE nconst='+'"'+inputID+'"';
     sqlPeopleArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
     console.log(sqlItem);
     console.log(sqlPeopleArray+'Before dbs');
@@ -424,6 +509,7 @@ function getPersonData(inputID) {
       //fill sqlHolder with data from each row
       rows.forEach((row) => { currentrowlength += 1;
         sqlPeopleArray.push({
+          nconst: row.nconst,
           primary_name: row.primary_name,
           primary_profession: row.primary_profession,
           birth_year: row.birth_year,
@@ -455,20 +541,20 @@ function posterDataFunction(title_id) {
             body += chunk;
         });
         res.on('end', () => {
-            
+
             var poster_link_pos = body.indexOf('<a href="/title/' + title_id + '/mediaviewer/');
             var poster_img_pos = body.indexOf('<img', poster_link_pos);
             var poster_src_pos = body.indexOf('src=', poster_img_pos) + 5;
             var poster_end_pos = body.indexOf('"', poster_src_pos);
-        
+
             var poster_url = url.parse(body.substring(poster_src_pos, poster_end_pos));
             if (poster_url.host !== null) {
-                posterImage = {host: poster_url.host, path: poster_url.pathname}; 
+                posterImage = {host: poster_url.host, path: poster_url.pathname};
                 console.log(posterImage+' adasdasdasda');
                 resolve(posterImage);
             }
             else {
-                posterImage = '/default_poster.jpg'; 
+                posterImage = '/default_poster.jpg';
                 console.log('poster not found');
                 resolve(posterImage);
             }
@@ -508,11 +594,11 @@ function posterPersonDataFunction(name_id) {
             var poster_end_pos = body.indexOf('"', poster_src_pos);
             var poster_url = url.parse(body.substring(poster_src_pos, poster_end_pos));
             if (poster_url.host !== null) {
-                posterImage = {host: poster_url.host, path: poster_url.pathname}; 
+                posterImage = {host: poster_url.host, path: poster_url.pathname};
                 console.log(posterImage+' personDataFunction');
                 resolve(posterImage);}
             else {
-                posterImage = '/default_poster.jpg'; 
+                posterImage = '/default_poster.jpg';
                 console.log('poster not found');
                 resolve(posterImage);
             }
@@ -542,7 +628,7 @@ function getTitleNames(names) {
 
     nameSplit.forEach((nameItem) => {
     sqlItem = 'SELECT tconst, primary_title FROM Titles WHERE tconst = "'+nameItem+'"';
-    
+
         var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
             if(err) {
                 return console.error(err.message);
@@ -586,7 +672,7 @@ function getCastNames(names) {
 
     nameSplit.forEach((nameItem) => {
     sqlItem = 'SELECT nconst, primary_name FROM Names WHERE nconst = "'+nameItem+'"';
-    
+
         var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
             if(err) {
                 return console.error(err.message);
@@ -601,7 +687,7 @@ function getCastNames(names) {
 
             //reject promise if no rows to prevent infinite loop
             if(rowlength < 1) { currentrowlength = 1; rowlength = 1;
-                
+
             }
             else {
                 //fill sqlHolder with data from each row
