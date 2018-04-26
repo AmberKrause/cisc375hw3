@@ -160,17 +160,24 @@
 				</table>
 			</div>
 			<div class="spacer"></div>
-			<div>Directors: <%= sqlTitleArray.directors.primary_name %>
+			<div>Directors: 
 				<ul>
 					<% for(var i = 0; i < sqlTitleArray.directorsNamed.length; i++) {%>
-					<li><a href="/person?id=<%= sqlTitleArray.directorsNamed[i].nconst %>"><%= sqlTitleArray.directorsNamed[i].primary_name %></a></li>
+					<li><a href="/person?id=<%= sqlTitleArray.directorsNamed[i].nconst %>">
+						<% if(sqlTitleArray.directorsNamed[i].primary_name !== null) {%>
+						<%= sqlTitleArray.directorsNamed[i].primary_name %>
+						<% } %>
+						</a></li>
 				<% } %>
 				</ul>
 			</div>
 			<div>Writers:
 				<ul>
 					<% for(var i = 0; i < sqlTitleArray.writersNamed.length; i++) {%>
-					<li><a href="/person?id=<%= sqlTitleArray.writersNamed[i].nconst %>"><%= sqlTitleArray.writersNamed[i].primary_name %></a></li>
+					<li><a href="/person?id=<%= sqlTitleArray.writersNamed[i].nconst %>">
+						<% if(sqlTitleArray.writersNamed[i].primary_name !== null) {%>
+						<%= sqlTitleArray.writersNamed[i].primary_name %>
+						<% } %></a></li>
 				<% } %>
 				</ul>
 			</div>
