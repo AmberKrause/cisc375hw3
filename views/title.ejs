@@ -162,8 +162,20 @@
 			</div>
 			<div class="spacer"></div>
 			<div>From Crew, but it seems like these are included in Principals already, so we may decide to delete:</div>
-			<div>Directors: <%= sqlTitleArray.directors %></div>
-			<div>Writers: <%= sqlTitleArray.writers %></div>
+			<div>Directors: <%= sqlTitleArray.directors.primary_name %>
+				<ul>
+					<% for(var i = 0; i < sqlTitleArray.directorsNamed.length; i++) {%>
+					<li><a href="/person?id=<%= sqlTitleArray.directorsNamed[i].nconst %>"><%= sqlTitleArray.directorsNamed[i].primary_name %></a></li>
+				<% } %>
+				</ul>
+			</div>
+			<div>Writers:
+				<ul>
+					<% for(var i = 0; i < sqlTitleArray.writersNamed.length; i++) {%>
+					<li><a href="/person?id=<%= sqlTitleArray.writersNamed[i].nconst %>"><%= sqlTitleArray.writersNamed[i].primary_name %></a></li>
+				<% } %>
+				</ul>
+			</div>
 		</form>
 
 

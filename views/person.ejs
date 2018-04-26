@@ -84,11 +84,15 @@
 			<div>Primary Professions: <%= sqlPeopleArray[0].primary_profession %></div>
 			<div class="spacer"></div>
 			<div>Known For:
-				<ul><% for(var i = 0; i < sqlPeopleArray[0].known_for_titles.split(',').length; i++) {%>
-					<li>
-						<a href="/title?id=<%= sqlPeopleArray[0].known_for_titles.split(',')[i] %>"><%= sqlPeopleArray[0].known_for_titles.split(',')[i] %></a>
-					</li>
-					<% } %>
+				<% sqlPeopleArray.forEach(function(x){%>
+				<ul>
+						<% for(var i = 0; i < x.known_for_titles2.length; i++) {%>
+						<li>
+						<a href="/title?id=<%= x.known_for_titles2[i].tconst %>"><%= x.known_for_titles2[i].primary_title %></a>
+						</li>
+						<% } %>
+				</ul>
+				<% }) %>
 				</table>
 			</div>
 
