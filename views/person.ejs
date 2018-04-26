@@ -2,59 +2,97 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1"/>
-	<title>Search Results</title>
+	<title>Person</title>
 	<style type="text/css">
 		html{
-			font-size: 62.5%;
+			font-size: 120%;
 		}
 
-		table, tr, td {
+		table, tr {
 			border-style: solid;
 		}
 
 		tr {
-			font-size: 2rem;
+			font-size: .8rem;
 		}
+
+		img, button, #updateButton {
+			float: right;
+			clear: right;
+			margin-bottom: 5px;
+		}
+
+		button {
+			margin-top: 5px;
+		}
+
+		.spacer {
+			height: 1rem;
+		}
+
+		.normalMode {
+
+		}
+
+		.editMode {
+			display: none;
+		}
+
 	</style>
+	<script src="/jquery-3.3.1.min.js"></script>
+	<script>
+		$(document).ready( function() {
+			$("#editButton").click(function() {
+				console.log("edit mode");
+				$(".editMode").show();
+				$(".normalMode").hide();
+			});
+
+			$("#cancelButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+			$("#updateButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+
+		});
+	</script>
 	<script src="/imdb_poster.js"></script>
 </head>
 <body>
 	<div id="container">
-		<h1>Person</h1>
-    <ul>
+		<form action="/" method="GET">
+			<input style="float: right" type="submit" value="Back to Search">
+		</form>
+		<button id="editButton" class="normalMode">Edit Page</button>
+		<button id="cancelButton" class="editMode">Cancel</button>
+		<form action="/updateName" method="POST">
+			<input name="nconst" style="display: none;" value="<%= sqlPeopleArray[0].nconst %>">
+			<input type="submit" id="updateButton" class="editMode" value="Submit Changes">
+			<h1><%= sqlPeopleArray[0].primary_name %></h1>
 
-    </ul>
+			<div class="spacer"></div>
+			<hr>
+			<img src="https://<%= personPoster.host %><%= personPoster.path %>" alt="Poster" height="300">
+			<div>Alive: <%= sqlPeopleArray[0].birth_year %> - <%= sqlPeopleArray[0].death_year %></div>
+			<div>Primary Professions: <%= sqlPeopleArray[0].primary_profession %></div>
+			<div class="spacer"></div>
+			<div>Known For:
+				<ul><% for(var i = 0; i < sqlPeopleArray[0].known_for_titles.split(',').length; i++) {%>
+					<li>
+						<a href="/title?id=<%= sqlPeopleArray[0].known_for_titles.split(',')[i] %>"><%= sqlPeopleArray[0].known_for_titles.split(',')[i] %></a>
+					</li>
+					<% } %>
+				</table>
+			</div>
 
-    <!-- Displays only if the user does not provide text information-->
-		<img src="https://<%= personPoster.host %><%= personPoster.path %>" alt="Poster" height="300">
-    <table>
-    	<tr>
-    		<th>Name</th>
-    		<th>Birth Year</th>
-    		<th>Death Year</th>
-    		<th>Primary Professions</th>
-    		<th>Known For</th>
-    	</tr>
-	<% sqlPeopleArray.forEach(function(x){%>
-		<tr>
-			<td><%= x.primary_name %></td>
-			<td><%= x.birth_year %></td>
-			<td><%= x.death_year %></td>
-			<td><%= x.primary_profession %></td>
-
-			<td><% for(var i = 0; i < x.known_for_titles.split(',').length; i++) {%>
-				<a href="/title?id=<%= x.known_for_titles.split(',')[i] %>"><%= x.known_for_titles.split(',')[i] %></a>
-				<% } %>
-
-				</td>
-
-		</tr>
-		<% }) %>
-	</table>
-	<!-- Displays only if the user does not provide text information-->
-
-
-
+		</form>
 	</div>
 </body>
 </html>
