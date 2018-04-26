@@ -16,15 +16,17 @@
 			font-size: 2rem;
 		}
 	</style>
+	<script src="/imdb_poster.js"></script>
 </head>
 <body>
 	<div id="container">
 		<h1>Person</h1>
     <ul>
-      
+
     </ul>
 
     <!-- Displays only if the user does not provide text information-->
+		<img src="https://<%= personPoster.host %><%= personPoster.path %>" alt="Poster" height="300">
     <table>
     	<tr>
     		<th>Name</th>
@@ -35,13 +37,13 @@
     	</tr>
 	<% sqlPeopleArray.forEach(function(x){%>
 		<tr>
-			<td><%= x.primary_name %></td> 
+			<td><%= x.primary_name %></td>
 			<td><%= x.birth_year %></td>
 			<td><%= x.death_year %></td>
 			<td><%= x.primary_profession %></td>
-			
-			<td><% for(var i = 0; i < x.known_for_titles.split(',').length; i++) {%> 
-				<a href="/title?id=<%= x.known_for_titles.split(',')[i] %>"><%= x.known_for_titles.split(',')[i] %></a> 
+
+			<td><% for(var i = 0; i < x.known_for_titles.split(',').length; i++) {%>
+				<a href="/title?id=<%= x.known_for_titles.split(',')[i] %>"><%= x.known_for_titles.split(',')[i] %></a>
 				<% } %>
 
 				</td>
@@ -51,7 +53,7 @@
 	</table>
 	<!-- Displays only if the user does not provide text information-->
 
-	
+
 
 	</div>
 </body>

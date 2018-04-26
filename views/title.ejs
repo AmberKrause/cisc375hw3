@@ -65,6 +65,7 @@
 
 		});
 	</script>
+	<script src="/imdb_poster.js"></script>
 </head>
 <body>
 	<div id="container">
@@ -94,8 +95,9 @@
 			</h2>
 
 			<hr>
-
+			<p>	<%= moviePoster.image %> stuff</p>
 			<img src="/default_poster.jpg" alt="Poster" height="300">
+			<img src="https://<%= moviePoster.host %><%= moviePoster.path %>" alt="Poster" height="300">
 			<div>Start Year: <%= sqlTitleArray.start_year %></div>
 			<% if(sqlTitleArray.end_year!==null) { %>
 			<div>End Year: <%= sqlTitleArray.end_year %>

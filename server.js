@@ -114,9 +114,81 @@ app.post('/search', (req, res) => {
 });//app.post end
 
 app.post('/updateTitle', (req, res) => {
-  console.log(req.headers);
+  //console.log(req.headers);
   console.log(req.body);
+  var sql;
+  if(req.body.type != 'noChange') {
+    sql = 'UPDATE Titles SET title_type = "' + req.body.type + '" WHERE tconst = "' + req.body.tconst + '"'
+    console.log(sql);
+    updateData(sql);
+  }
+  if(req.body.genreChange != 'noChange') {
+    //get current genres
+    sql = 'SELECT genres FROM Titles WHERE tconst = "' + req.body.tconst + '"'
+    var myPromise = new Promise(function(resolve, reject) {
+      var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+         if(err) {
+           console.error(err.message);
+         }//if(err) end
+       });//dbs end
+       dbs.get(sql, [], (err, row) => {
+         if(err) {// logs error
+           console.log(err);
+         }//if(err)
+         else {
+           var currentGenres = row.genres;
+           resolve(currentGenres);
+           console.log(currentGenres);
+         }
+      });//dbs end
+      dbs.close();
+    });
 
+    myPromise.then((currentGenres) => {
+      if(req.body.genreChange == 'add') {
+        currentGenres = currentGenres.split(",");
+        console.log(currentGenres);
+        if(currentGenres.indexOf(req.body.genre) < 0) {
+          currentGenres.push(req.body.genre);
+          console.log(currentGenres);
+          currentGenres = currentGenres.filter(function(val) { return val; }).join(",");
+          console.log(currentGenres);
+          sql = 'UPDATE Titles SET genres = "' + currentGenres + '" WHERE tconst = "' + req.body.tconst + '"'
+          updateData(sql);
+          console.log("add genre: " + req.body.genre);
+        }
+      }
+      else {
+        currentGenres = currentGenres.split(",");
+        var index = currentGenres.indexOf(req.body.genre);
+        if(index >= 0) {
+          currentGenres.splice(index, 1);
+          console.log(currentGenres);
+          sql = 'UPDATE Titles SET genres = "' + currentGenres + '" WHERE tconst = "' + req.body.tconst + '"'
+          updateData(sql);
+        }
+        console.log("remove genre: " + req.body.genre);
+      }
+    }).catch(function(err) {
+        console.log('Could not update genre: ' + err.message);
+    });
+
+  }
+  for(var key in req.body) {
+      if(key.substring(0, 2) === 'nm') {
+        req.sanitizeBody(key).trim();
+        req.sanitizeBody(key).escape();
+        req.sanitizeBody(key).blacklist('\\(\\)\\;');
+        var value = req.body[key];
+        console.log(key + ": " + value);
+        value = parseInt(value);
+        if(!isNaN(value)) {
+          sql = 'UPDATE Principals SET ordering = ' + value + ' WHERE tconst = "' + req.body.tconst + '" AND nconst = "' + key + '"'
+          console.log(sql);
+          updateData(sql);
+        }
+      }
+  }
 
 
 });//app.post end
@@ -135,7 +207,7 @@ app.get('/title', function(req, res){
     });//res.render end
     //console.log(values);
     //console.log(values[0]);
-		console.log('Title Array'+' '+values[0]+' Title Principals Array: '+values[1]);
+		//console.log('Title Array'+' '+values[0]+' Title Principals Array: '+values[1]);
 	}).catch(function(err) {
       console.log('Error when rendering title page:' + err.message);
   });//getExtendedData end
@@ -218,11 +290,11 @@ function getExtendData(inputID) {
     //var rowlength; //to hold rowlength
     //var currentrowlength = 0; //to hold current row
 
-    var sqlItem = 'SELECT Titles.tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") AS Titles LEFT OUTER JOIN Ratings ON Titles.tconst=Ratings.tconst LEFT OUTER JOIN Crew ON Titles.tconst=Crew.tconst';
+    var sqlItem = 'SELECT Titles.tconst AS tconst, primary_title, title_type, start_year, end_year, runtime_minutes, genres, average_rating, num_votes, directors, writers FROM (SELECT * FROM Titles WHERE tconst="'+inputID+'") AS Titles LEFT OUTER JOIN Ratings ON Titles.tconst=Ratings.tconst LEFT OUTER JOIN Crew ON Titles.tconst=Crew.tconst';
     sqlTitleArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
 	   var myPromise = new Promise(function(resolve, reject) {
-	     var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+       var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
 	        if(err) {
             return console.error(err.message);
              }//if(err) end
@@ -256,7 +328,7 @@ function getExtendData(inputID) {
 function getTitlePrincipalData(inputID) {
     var rowlength; //to hold rowlength
     var currentrowlength = 0; //to hold current row
-    var sqlItem = 'SELECT Titles.tconst, ordering, Principals.nconst, category, primary_name FROM (SELECT * FROM Titles WHERE tconst='+'"'+inputID+'") AS Titles LEFT OUTER JOIN Principals ON Titles.tconst=Principals.tconst LEFT OUTER JOIN Names ON Principals.nconst=Names.nconst ORDER BY ordering';
+    var sqlItem = 'SELECT Titles.tconst AS tconst, ordering, Principals.nconst AS nconst, category, primary_name FROM (SELECT * FROM Titles WHERE tconst='+'"'+inputID+'") AS Titles LEFT OUTER JOIN Principals ON Titles.tconst=Principals.tconst LEFT OUTER JOIN Names ON Principals.nconst=Names.nconst ORDER BY ordering';
     sqlTitlePrincipalsArray = []; //resets the sqlHolder array to be empty so data doesn't repeat
 
 	   var myPromise = new Promise(function(resolve, reject) {
@@ -270,7 +342,7 @@ function getTitlePrincipalData(inputID) {
           if(rows === undefined) {
             reject('No query results');
           }
-          //console.log(rows);
+          console.log(rows);
         	//console.log('rowlength = rows.length')
 
         	if(err) {// logs error
@@ -353,7 +425,22 @@ function getPersonData(inputID) {
 }//getPersonData End
 
 
+function updateData(sql) { //gets the SQL data
+  var dbs = new sqlite3.Database('./imdb.sqlite3', (err) => {
+		if(err) {
+			return console.error(err.message);
+		}
+	});
 
+  dbs.run(sql, [], (err) => {
+    if(err) {
+      return console.error(err.message);
+    }
+  });
+
+  console.log('Row updated');
+  dbs.close();
+}//getData end
 
 
 
