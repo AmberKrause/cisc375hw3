@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Person</title>
+	<style type="text/css">
+		html{
+			font-size: 120%;
+		}
+
+		table, tr {
+			border-style: solid;
+		}
+
+		tr {
+			font-size: .8rem;
+		}
+
+		img, button, #updateButton {
+			float: right;
+			clear: right;
+			margin-bottom: 5px;
+		}
+
+		button {
+			margin-top: 5px;
+		}
+
+		.spacer {
+			height: 1rem;
+		}
+
+		.normalMode {
+
+		}
+
+		.editMode {
+			display: none;
+		}
+
+	</style>
+	<script src="/jquery-3.3.1.min.js"></script>
+	<script>
+		$(document).ready( function() {
+			$("#editButton").click(function() {
+				console.log("edit mode");
+				$(".editMode").show();
+				$(".normalMode").hide();
+			});
+
+			$("#cancelButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+			$("#updateButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+
+		});
+	</script>
+	<script src="/imdb_poster.js"></script>
+</head>
+<body>
+	<div id="container">
+		<form action="/" method="GET">
+			<input style="float: right" type="submit" value="Back to Search">
+		</form>
+		<button id="editButton" class="normalMode">Edit Page</button>
+		<button id="cancelButton" class="editMode">Cancel</button>
+		<form action="/updateName" method="POST">
+			<input name="nconst" style="display: none;" value="<%= sqlPeopleArray[0].nconst %>">
+			<input type="submit" id="updateButton" class="editMode" value="Submit Changes">
+			<h1><%= sqlPeopleArray[0].primary_name %></h1>
+
+			<div class="spacer"></div>
+			<hr>
+			<img src="https://<%= personPoster.host %><%= personPoster.path %>" alt="Poster" height="300">
+			<div>Alive: <%= sqlPeopleArray[0].birth_year %> - <%= sqlPeopleArray[0].death_year %></div>
+			<div class="editMode">
+				Birth Year: <input name="birth_year" type="text"></input>
+				Death Year: <input name="death_year" type="text"></input>
+			</div>
+			<div>Primary Professions: <%= sqlPeopleArray[0].primary_profession %></div>
+			<div class="editMode">Profession: <select name="profession">
+				<option value="soundtrack">soundtrack</option>
+				<option value="actor">actor</option>
+				<option value="miscellaneous">miscellaneous</option>
+				<option value="actress">actress</option>
+				<option value="producer">producer</option>
+				<option value="writer">writer</option>
+				<option value="director">director</option>
+				<option value="make_up_department">make_up_department</option>
+				<option value="composer">composer</option>
+				<option value="music_department">music_department</option>
+				<option value="assistant_director">assistant_director</option>
+				<option value="camera_department">camera_department</option>
+				<option value="casting_director">casting_director</option>
+				<option value="editor">editor</option>
+				<option value="set_decorator">set_decorator</option>
+				<option value="art_director">art_director</option>
+				<option value="stunts">stunts</option>
+				<option value="editorial_department">editorial_department</option>
+				<option value="costume_department">costume_department</option>
+				<option value="art_department">art_department</option>
+				<option value="executive">executive</option>
+				<option value="animation_department">animation_department</option>
+				<option value="special_effects">special_effects</option>
+				<option value="cinematographer">cinematographer</option>
+				<option value="production_designer">production_designer</option>
+				<option value="production_manager">production_manager</option>
+				<option value="sound_department">sound_department</option>
+				<option value="talent_agent">talent_agent</option>
+				<option value="casting_department">casting_department</option>
+				<option value="costume_designer">costume_designer</option>
+				<option value="visual_effects">visual_effects</option>
+				<option value="location_management">location_management</option>
+				<option value="transportation_department">transportation_department</option>
+				<option value="manager">manager</option>
+				<option value="legal">legal</option>
+				<option value="assistant">assistant</option>
+				<option value="publicist">publicist</option>
+			</select></div>
+			<div class="editMode">Add or remove:
+				<select name="professionChange">
+					<option value="noChange">No Change</option>
+					<option value="add">Add</option>
+					<option value="remove">Remove</option>
+				</select>
+			</div>
+			<div class="spacer"></div>
+			<div>Known For:
+				<% sqlPeopleArray.forEach(function(x){%>
+				<ul>
+						<% for(var i = 0; i < x.known_for_titles2.length; i++) {%>
+						<li>
+						<a href="/title?id=<%= x.known_for_titles2[i].tconst %>"><%= x.known_for_titles2[i].primary_title %></a>
+						</li>
+						<% } %>
+				</ul>
+				<% }) %>
+				</table>
+			</div>
+
+		</form>
+	</div>
+</body>
+</html>

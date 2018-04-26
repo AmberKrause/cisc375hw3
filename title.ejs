@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1"/>
+	<title>Title</title>
+	<style type="text/css">
+		html{
+			font-size: 120%;
+		}
+
+		table, tr {
+			border-style: solid;
+		}
+
+		tr {
+			font-size: .8rem;
+		}
+
+
+
+		img, button, #updateButton {
+			float: right;
+			clear: right;
+			margin-bottom: 5px;
+		}
+
+		button {
+			margin-top: 5px;
+		}
+
+		.spacer {
+			height: 1rem;
+		}
+
+		.normalMode {
+
+		}
+
+		.editMode {
+			display: none;
+		}
+
+	</style>
+	<script src="/jquery-3.3.1.min.js"></script>
+	<script>
+		$(document).ready( function() {
+			$("#editButton").click(function() {
+				console.log("edit mode");
+				$(".editMode").show();
+				$(".normalMode").hide();
+			});
+
+			$("#cancelButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+			$("#updateButton").click(function() {
+				console.log("normal mode");
+				$(".editMode").hide();
+				$(".normalMode").show();
+			});
+
+
+		});
+	</script>
+	<script src="/imdb_poster.js"></script>
+</head>
+<body>
+	<div id="container">
+		<form action="/" method="GET">
+			<input style="float: right" type="submit" value="Back to Search">
+		</form>
+		<button id="editButton" class="normalMode">Edit Page</button>
+		<button id="cancelButton" class="editMode">Cancel</button>
+		<form action="/updateTitle" method="POST">
+			<input name="tconst" style="display: none;" value="<%= sqlTitleArray.tconst %>">
+			<input type="submit" id="updateButton" class="editMode" value="Submit Changes">
+			<h1><%= sqlTitleArray.primary_title %></h1>
+			<h2><%= sqlTitleArray.title_type %>
+			<div class="editMode">Change type:
+				<select name="type">
+					<option value="noChange">No Change</option>
+					<option value="short">Short</option>
+					<option value="movie">Movie</option>
+					<option value="tvMovie">TV Movie</option>
+					<option value="tvSeries">TV Series</option>
+					<option value="tvShort">TV Short</option>
+					<option value="tvMiniSeries">TV Mini Series</option>
+					<option value="tvSpecial">TV Special</option>
+					<option value="videoGame">Video Game</option>
+				</select>
+			</div>
+			</h2>
+
+			<hr>
+			<p>	<%= moviePoster.image %> </p>
+			<img src="https://<%= moviePoster.host %><%= moviePoster.path %>" alt="Poster" height="300">
+			<div>Start Year: <%= sqlTitleArray.start_year %></div>
+			<% if(sqlTitleArray.end_year!==null) { %>
+			<div>End Year: <%= sqlTitleArray.end_year %>
+			<% } %>
+			<div class="spacer"></div>
+			<div>Runtime: <%= sqlTitleArray.runtime_minutes %> minutes</div>
+			<div>Genres: <%= sqlTitleArray.genres %></div>
+			<div class="editMode">Genre:
+				<select name="genre">
+					<option value="Comedy">Comedy</option>
+					<option value="Fantasy">Fantasy</option>
+					<option value="Sci-Fi">Sci-Fi</option>
+					<option value="Romance">Romance</option>
+					<option value="Documentary">Documentary</option>
+					<option value="Short">Short</option>
+					<option value="Animation">Animation</option>
+					<option value="Sport">Sport</option>
+					<option value="News">News</option>
+					<option value="Biography">Biography</option>
+					<option value="Drama">Drama</option>
+					<option value="Horror">Horror</option>
+					<option value="Thriller">Thriller</option>
+					<option value="Music">Music</option>
+					<option value="War">War</option>
+					<option value="Crime">Crime</option>
+					<option value="Mystery">Mystery</option>
+					<option value="History">History</option>
+					<option value="Western">Western</option>
+					<option value="Family">Family</option>
+					<option value="Adventure">Adventure</option>
+				</select>
+			</div>
+			<div class="editMode">Add or remove:
+				<select name="genreChange">
+					<option value="noChange">No Change</option>
+					<option value="add">Add</option>
+					<option value="remove">Remove</option>
+				</select>
+			</div>
+			<div class="spacer"></div>
+			<div>Average Rating: <%= sqlTitleArray.average_rating %></div>
+			<div>Votes: <%= sqlTitleArray.num_votes %></div>
+			<div class="spacer"></div>
+			<div>Top Billed Cast:
+				<table>
+					<tr>
+						<th>Order</th>
+						<th>Name</th>
+						<th>Role</th>
+						<th class="editMode">New Order</th>
+					</tr>
+				<% sqlTitlePrincipalsArray.forEach(function(x){%>
+				<tr>
+					<td><%= x.ordering %></td>
+					<td><a href="/person?id=<%= x.nconst %>">
+						<%= x.primary_name %></a></td>
+					<td><%= x.category %></td>
+					<td class="editMode"><input name="<%= x.nconst %>" type="text"></input><td>
+				</tr>
+				<% }) %>
+				</table>
+			</div>
+			<div class="spacer"></div>
+			<div>Directors: 
+				<ul>
+					<% for(var i = 0; i < sqlTitleArray.directorsNamed.length; i++) {%>
+					<li><a href="/person?id=<%= sqlTitleArray.directorsNamed[i].nconst %>">
+						<% if(sqlTitleArray.directorsNamed[i].primary_name !== null) {%>
+						<%= sqlTitleArray.directorsNamed[i].primary_name %>
+						<% } %>
+						</a></li>
+				<% } %>
+				</ul>
+			</div>
+			<div>Writers:
+				<ul>
+					<% for(var i = 0; i < sqlTitleArray.writersNamed.length; i++) {%>
+					<li><a href="/person?id=<%= sqlTitleArray.writersNamed[i].nconst %>">
+						<% if(sqlTitleArray.writersNamed[i].primary_name !== null) {%>
+						<%= sqlTitleArray.writersNamed[i].primary_name %>
+						<% } %></a></li>
+				<% } %>
+				</ul>
+			</div>
+		</form>
+
+
+
+	</div>
+
+
+</body>
+</html>
