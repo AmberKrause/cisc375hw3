@@ -11,10 +11,15 @@
 			text-decoration: none;
 			color: #3e3e3e;
 			font-weight: bold;
+		}
+		.linkSetupItem {
+			text-decoration: none;
+			color: #3e3e3e;
+			font-weight: bold;
 			padding: 0 2em;
 			float: center;
 		}
-		#infoHeader{text-align: center;}
+		.infoHeader{text-align: center;}
 		#amber{margin-top: 30px;}
 		#nou {width: 100%;}
 		.center {text-align: center;}
@@ -22,15 +27,17 @@
 			text-align: center;
 			font-size: 2rem;
 		}
+		hr {margin: 0; padding: 0;}
 
 	</style>
 </head>
 <body>
 	<div class="linkSetup">
-		<a href="#amber">Amber</a>
-		<a href="#nou">Nou</a>
-		<a href="#projectInfo">Project Info</a>
-		<a href="#video">Video</a>
+		<a class="linkSetupItem" href="#amber">Amber</a>
+		<a class="linkSetupItem" href="#nou">Nou</a>
+		<a class="linkSetupItem" href="#projectInfo">Project Info</a>
+		<a class="linkSetupItem" href="#video">Video</a>
+		<a class="linkSetupItem" href="http://localhost:3000/">Back to Local Host 3000</a>
 	</div>
 
 	<div id="amber">
@@ -46,7 +53,7 @@
 
 	</div>
 	<div id="projectInfo">
-		<h1 id="infoHeader">Modules Used</h1><hr>
+		<hr><h1 class="infoHeader">Modules Used</h1><hr>
 		<h3>Express.js</h3>
 		<p>Express, is a web app framework that we used with Node.js to build this app. It's needed for the other modules.
 		Express allows for us to do GET/POST/SET/USE(module) with web pages, thus allowing us to get and display data directly to the pages with user requests.</p>
@@ -69,11 +76,23 @@
 		<h4>PATH</h4>
 		<p>Allows for file and directory path usage. Sends the users to them. </p>
 
-		<h4>HTTP</h4>
+		<h4>HTTP/HTTPS</h4>
 		<p>Allows for us to setup the HTTP web server and client.</p>
 
 		<h4>URL</h4>
 		<p>Gives the capability for adjusting URL resolution and parsing.</p>
+		<hr>
+		<h1 class="infoHeader">Other</h1>
+		<hr>
+		<h4>Marrinan Code</h4>
+		<p>Professor Marrinan gave us a javascript callback code to use, but we don't use callbacks and the code itself was broken anyways so we broke the code and modified it to work with our code.</p>
+
+		<h4>JQuery</h4>
+		<p>Used to Show and Hide the edit menu</p>
+
+		<h4><a href="https://placeholder.com/">https://placeholder.com/</a></h4>
+		<p>Used for the placeholder image, for when the picture isn't loaded or if someone doesn't have a photo. It's in the background so it
+		is easily covered up by the original image after it has loaded.</p>
 	</div>
 	<hr>
 	<div id="video">
