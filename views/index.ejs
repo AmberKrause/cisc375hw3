@@ -8,7 +8,7 @@
 		table, tr, td {border-style: solid;}
 		tr {font-size: 2rem;}
 		form {margin-bottom: 10px;}
-		.display-none { position: absolute; top: 25%; left: 25%; font-size:5rem; display: none;}
+		.display-none { position: fixed; top: 25%; left: 25%; font-size:5rem; display: none;}
 		.heartBeatDisplay {display: inline-block; animation:heartBeat 1s; animation-iteration-count: infinite;}
 		@keyframes heartBeat {from {transform: scale(1.0);} to {transform: scale(1.5);} }
 		#about {position: absolute; top: 0em; right: 5%; text-decoration: none; color: #3e3e3e;}
@@ -16,6 +16,12 @@
 	</style>
 	<script type="text/javascript">
 		function autoInit() {
+			var loading = document.getElementById('submitItem');
+			loading.addEventListener('click', function(event) {
+				var inputItem = document.getElementById('inputItem');
+				if(inputItem.value !== null) {document.getElementById('loadingItem').classList.add('heartBeatDisplay')}
+			});
+
 			var category = document.getElementById("category");
 			category.addEventListener("change", function(event) {
 				var titleLabel = document.getElementById("titleLabel");
@@ -39,14 +45,11 @@
 				}
 			});
 		}
-		function unload() {
-    		document.getElementById('loadingItem').classList.add('heartBeatDisplay')
-		}
 
 	</script>
 	<title>Home</title>
 </head>
-<body onload="autoInit()" onbeforeunload="return unload()">
+<body onload="autoInit()">
 	<div id="container">
 		<h1>TV/Movie Wiki</h1>
 		<form action="/search" method="POST">
