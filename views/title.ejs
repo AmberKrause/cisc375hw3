@@ -41,6 +41,12 @@
 		}
 
 	</style>
+	<style type="text/css">
+		.display-none { position: absolute; top: 2%; left: 25%; font-size:5rem; display: none;}
+		.heartBeatDisplay {display: inline-block; animation:heartBeat 1s; animation-iteration-count: infinite;}
+		@keyframes heartBeat {from {transform: scale(1.0);} to {transform: scale(1.5);} }
+		.tempImg {background: transparent url('http://via.placeholder.com/205x300') center no-repeat;}
+	</style>
 	<script src="/jquery-3.3.1.min.js"></script>
 	<script>
 		$(document).ready( function() {
@@ -65,9 +71,15 @@
 
 		});
 	</script>
+	<script type="text/javascript">
+		function unload() {
+    		document.getElementById('loadingItem').classList.add('heartBeatDisplay')
+		}
+	</script>
 	<script src="/imdb_poster.js"></script>
 </head>
-<body>
+<body onbeforeunload="return unload()">
+	<div id="loadingItem" class="display-none">Loading</div>
 	<div id="container">
 		<form action="/" method="GET">
 			<input style="float: right" type="submit" value="Back to Search">
@@ -96,7 +108,7 @@
 
 			<hr>
 			<p>	<%= moviePoster.image %> </p>
-			<img src="https://<%= moviePoster.host %><%= moviePoster.path %>" alt="Poster" height="300">
+			<img class="tempImg" src="https://<%= moviePoster.host %><%= moviePoster.path %>" alt="Poster" height="300">
 			<div>Start Year: <%= sqlTitleArray.start_year %></div>
 			<% if(sqlTitleArray.end_year!==null) { %>
 			<div>End Year: <%= sqlTitleArray.end_year %>

@@ -19,9 +19,18 @@
 		form {
 			margin-bottom: 10px;
 		}
+		.display-none { position: absolute; top: 2%; left: 25%; font-size:5rem; display: none;}
+		.heartBeatDisplay {display: inline-block; animation:heartBeat 1s; animation-iteration-count: infinite;}
+		@keyframes heartBeat {from {transform: scale(1.0);} to {transform: scale(1.5);} }
 	</style>
+	<script type="text/javascript">
+		function unload() {
+    		document.getElementById('loadingItem').classList.add('heartBeatDisplay')
+		}
+	</script>
 </head>
-<body>
+<body onbeforeunload="return unload()">
+	<div id="loadingItem" class="display-none">Loading</div>
 	<div id="container">
 		<h1>Results</h1>
 
@@ -46,14 +55,14 @@
 			<% sqlHolder.forEach(function(x){%>
 				<% if(x.type==='title') { %>
 					<tr>
-						<td><a href="/title?id=<%= x.tconst %>"><%= x.primary_title %></a></td>
+						<td><a class='loaderTag' href="/title?id=<%= x.tconst %>"><%= x.primary_title %></a></td>
 						<td><%= x.title_type %></td>
 						<td><%= x.start_year %></td>
 						<td><%= x.end_year %></td>
 					</tr>
 				<% } else {%>
 					<tr>
-						<td><a href="/person?id=<%= x.nconst %>"><%= x.primary_name %></a></td>
+						<td><a class='loaderTag' href="/person?id=<%= x.nconst %>"><%= x.primary_name %></a></td>
 						<td><%= x.primary_profession %></td>
 						<td><%= x.birth_year %></td>
 						<% if(x.death_year===null) { %>
@@ -69,5 +78,6 @@
 
 
 	</div>
+	<div id="loadingItem" class="display-none">Loading</div>
 </body>
 </html>

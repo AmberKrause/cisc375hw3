@@ -16,12 +16,6 @@
 	</style>
 	<script type="text/javascript">
 		function autoInit() {
-			var loading = document.getElementById('submitItem');
-			loading.addEventListener('click', function(event) {
-				var inputItem = document.getElementById('inputItem');
-				if(inputItem.value !== null) {document.getElementById('loadingItem').classList.add('heartBeatDisplay')}
-			});
-
 			var category = document.getElementById("category");
 			category.addEventListener("change", function(event) {
 				var titleLabel = document.getElementById("titleLabel");
@@ -45,11 +39,14 @@
 				}
 			});
 		}
+		function unload() {
+    		document.getElementById('loadingItem').classList.add('heartBeatDisplay')
+		}
 
 	</script>
 	<title>Home</title>
 </head>
-<body onload="autoInit()">
+<body onload="autoInit()" onbeforeunload="return unload()">
 	<div id="container">
 		<h1>TV/Movie Wiki</h1>
 		<form action="/search" method="POST">
