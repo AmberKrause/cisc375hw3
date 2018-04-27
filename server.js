@@ -582,10 +582,7 @@ function posterDataFunction(title_id) {
         console.log(err);
     });
 
-    req.on('timeout', () => {
-        console.log('timeout', null);
-        req.abort();
-    });
+    
 
     req.setTimeout(5000);
     req.end();
@@ -624,11 +621,6 @@ function posterPersonDataFunction(name_id) {
 
     req.on('error', (err) => {
         console.log(err);
-    });
-
-    req.on('timeout', () => {
-        console.log('timeout', null);
-        req.abort();
     });
 
     req.setTimeout(5000);
