@@ -197,6 +197,9 @@ app.post('/updateTitle', (req, res) => {
         }
       }
   }
+  setTimeout(() => {
+    res.redirect('/title?id=' + req.body.tconst);
+  }, 5000);
 
 });//app.post end
 
@@ -206,6 +209,7 @@ app.post('/updateName', (req, res) => {
   req.sanitizeBody('birth_year').trim();
   req.sanitizeBody('birth_year').escape();
   req.sanitizeBody('birth_year').blacklist('\\(\\)\\;');
+  req.sanitizeBody('death_year').trim();
   req.sanitizeBody('death_year').escape();
   req.sanitizeBody('death_year').blacklist('\\(\\)\\;');
   var birth = parseInt(req.body.birth_year);
@@ -221,8 +225,8 @@ app.post('/updateName', (req, res) => {
     sql = 'UPDATE Names SET death_year = ' + death + ' WHERE nconst = "' + req.body.nconst + '";';
     console.log(sql);
     updateData(sql);
-  } else if(req.body.death_year.length > 0 && req.body.death_year.trim() === '') {
-    //set death year to null if they enter whitespace
+  } else if(req.body.death_year === 'present') {
+    //set death year to null if they enter 'present', otherwise the database will only be updated if they enter a number
     sql = 'UPDATE Names SET death_year = null WHERE nconst = "' + req.body.nconst + '";';
     console.log(sql);
     updateData(sql);
@@ -277,6 +281,10 @@ app.post('/updateName', (req, res) => {
         console.log('Could not update profession: ' + err.message);
     });
   }
+
+  setTimeout(() => {
+    res.redirect('/person?id=' + req.body.nconst);
+  }, 5000);
 });//app.post end
 
 
@@ -525,12 +533,14 @@ function getPersonData(inputID) {
 
       //fill sqlHolder with data from each row
       rows.forEach((row) => { currentrowlength += 1;
+        var death_year_input = row.death_year;
+        if(death_year_input == null) { death_year_input = "present"; }
         sqlPeopleArray.push({
           nconst: row.nconst,
           primary_name: row.primary_name,
           primary_profession: row.primary_profession,
           birth_year: row.birth_year,
-          death_year: row.death_year,
+          death_year: death_year_input,
           known_for_titles: row.known_for_titles,
           known_for_titles2: getTitleNames(row.known_for_titles)
         });//sql push
@@ -582,7 +592,7 @@ function posterDataFunction(title_id) {
         console.log(err);
     });
 
-    
+
 
     req.setTimeout(5000);
     req.end();
